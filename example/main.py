@@ -2,11 +2,11 @@
 
 import asyncio
 
-from disnake.ext import commands
+from disnake.ext import cornsnake
 
 
 async def main() -> None:
-    bot = commands.Bot()
+    bot = cornsnake.Bot()
 
     await bot.start("TOKEN")
 

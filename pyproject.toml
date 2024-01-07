@@ -7,7 +7,7 @@ authors = [
     { name = "elenakrittik", email = "dev.elenakrittik@gmail.com" },
 ]
 dependencies = [
-    "disnake==2.9.*",
+    "disnake @ git+https://github.com/DisnakeDev/disnake@a5c1a8f",
 ]
 requires-python = ">=3.9"
 readme = "README.md"
@@ -181,6 +181,7 @@ ignore = [
     "ANN101",  # requires self: Self
     "TD002",   # requires author in TODOs
     "TD003",   # requires issue link in TODOs
+    "ANN102",  # requires cls: type[Self]
 ]
 
 [tool.towncrier]

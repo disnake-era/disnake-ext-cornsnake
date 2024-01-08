@@ -11,6 +11,10 @@ from .utils import copy_sig
 if TYPE_CHECKING:
     from typing import Any
 
+    from typing_extensions import Self
+
+    from disnake import AppCmdInter
+
     from disnake.ext.cornsnake.slash_command import SlashCommand
 
 
@@ -18,4 +22,9 @@ class Bot(Client):
     @copy_sig(Client.__init__)
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        self.slash_commands: list[SlashCommand] = []
+        self.slash_commands: list[SlashCommand[Any]] = []
+
+    async def on_application_command(self, inter: AppCmdInter[Self]) -> None:
+        for slash in self.slash_commands:
+            if slash.name == inter.data.name:
+                await slash.invoke(inter)

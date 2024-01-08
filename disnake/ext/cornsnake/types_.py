@@ -2,16 +2,12 @@
 
 from __future__ import annotations
 
-import typing as t
+from typing import TYPE_CHECKING
 
-if t.TYPE_CHECKING:
-    from typing_extensions import Concatenate, ParamSpec
-
-    from disnake import AppCmdInter
+if TYPE_CHECKING:
+    from typing import Any, Awaitable, Callable
 
     from .decorators import PendingSlashCommand
 
-    P = ParamSpec("P", default=[AppCmdInter])
-
-    SlashCommandCallbackType = t.Callable[Concatenate[P], t.Awaitable[t.Any]]
-    PendingCallback = PendingSlashCommand[P] | SlashCommandCallbackType[P]
+    SlashCommandCallbackType = Callable[..., Awaitable[Any]]
+    PendingCallback = PendingSlashCommand | SlashCommandCallbackType

@@ -2,17 +2,16 @@
 
 from __future__ import annotations
 
-import typing as t
+from typing import TYPE_CHECKING
 
-if t.TYPE_CHECKING:
-    from disnake import Option
-    from disnake.ext.cornsnake.types_ import P, SlashCommandCallbackType
-else:
-    P = t.TypeVar("P")
+if TYPE_CHECKING:
+    from typing import Any
+    from disnake import AppCmdInter, Option
+    from .types_ import SlashCommandCallbackType
 
 
-class PendingSlashCommand(t.Generic[P]):
-    def __init__(self, callback: SlashCommandCallbackType[P]) -> None:
+class PendingSlashCommand:
+    def __init__(self, callback: SlashCommandCallbackType) -> None:
         self.callback = callback
         self.options: list[Option] = []
 
@@ -20,17 +19,20 @@ class PendingSlashCommand(t.Generic[P]):
         self.options.append(option)
 
 
-class SlashCommand(PendingSlashCommand[P]):
+class SlashCommand(PendingSlashCommand):
     def __init__(
         self,
         name: str,
-        callback: SlashCommandCallbackType[P],
+        callback: SlashCommandCallbackType,
     ) -> None:
         super().__init__(callback)
         self.name = name
 
     @classmethod
-    def from_pending(cls, name: str, pending: PendingSlashCommand[P]) -> SlashCommand[P]:
+    def from_pending(cls, name: str, pending: PendingSlashCommand) -> SlashCommand:
         command = cls(name, pending.callback)
         command.options = pending.options
         return command
+
+    async def invoke(self, inter: AppCmdInter[Any]) -> None:
+        self.callback(inter)

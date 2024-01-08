@@ -5,9 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Any, Awaitable, Callable
+    from collections.abc import Awaitable
+    from typing import Any, Callable
 
-    from .decorators import PendingSlashCommand
-
-    SlashCommandCallbackType = Callable[..., Awaitable[Any]]
-    PendingCallback = PendingSlashCommand | SlashCommandCallbackType
+    SlashCommandCallable = Callable[..., Awaitable[Any]]

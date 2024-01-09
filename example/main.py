@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import os
 
 from disnake import AppCmdInter, OptionType
 from disnake.ext import cornsnake
@@ -18,7 +19,7 @@ async def main() -> None:
 
     bot.slash_commands.append(idkcmd)
 
-    await bot.start("MTEyMTIwNjU2MDU5MzU0NzI3NA.G4gBto.4bXD_oJbhgTp529AA3K3sC4GlUuxVoITC0a1C0")
+    await bot.start(os.environ["BOT_TOKEN"])
 
 
 asyncio.run(main())

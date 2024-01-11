@@ -13,35 +13,11 @@ from .utils import copy_sig
 if TYPE_CHECKING:
     from typing import Any
 
-    from typing_extensions import Self, TypeAlias, TypedDict
+    from typing_extensions import Self
 
     from disnake import AppCmdInter
 
-    from .slash_command_ import SlashCommand
-
-    AnySlash: TypeAlias = "SlashCommand | GuildSlashCommand"
-
-    class CommandDiff(TypedDict):
-        to_upsert: list[AnySlash]
-        to_delete: list[AnySlash]
-
-
-async def command_diff(client: Client, local: list[AnySlash]) -> CommandDiff:
-    diff: CommandDiff = { "to_upsert": [], "to_delete": [] }
-
-    local_global_commands: set[SlashCommand] = set(filter(lambda cmd: not isinstance(cmd, GuildSlashCommand), local))  # type: ignore
-    remote_global_command_names = tuple(cmd.name for cmd in await client.fetch_global_commands(with_localizations=False))
-
-    # We assume all guilds the bot is in are cached already
-    # guild_ids = tuple(guild.id for guild in client.guilds)
-
-    for cmd in local_global_commands:
-        if cmd.name not in remote_global_command_names:
-            diff["to_delete"].append(cmd)
-
-    for cmd
-
-    return diff
+    from .types_ import AnySlash
 
 
 class Bot(Client):

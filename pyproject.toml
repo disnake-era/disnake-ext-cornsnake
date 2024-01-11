@@ -8,6 +8,7 @@ authors = [
 ]
 dependencies = [
     "disnake @ git+https://github.com/DisnakeDev/disnake@a5c1a8f",
+    "asyncstdlib>=3.12.0",
 ]
 requires-python = ">=3.9"
 readme = "README.md"

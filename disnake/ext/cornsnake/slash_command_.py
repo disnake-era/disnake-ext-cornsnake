@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Generic
 
 from disnake import APISlashCommand
 from disnake.app_commands import SlashCommand as DisnakeSlashCommand
@@ -15,12 +15,13 @@ if TYPE_CHECKING:
     from disnake.app_commands import APIApplicationCommand
     from disnake.i18n import LocalizedRequired
 
-    from .types_ import SlashCommandCallable
+    from .types_ import CheckCallable, P, SlashCommandCallable
 
 
 @dataclass
-class PendingSlashCommand:
+class PendingSlashCommand(Generic["P"]):
     cb: SlashCommandCallable
+    checks: list[CheckCallable[P]]
     options: list[Option]
 
 

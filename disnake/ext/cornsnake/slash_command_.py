@@ -56,7 +56,7 @@ class SlashCommand(DisnakeSlashCommand):
         await self.callback(inter, **inter.options)
 
 class GuildSlashCommand(SlashCommand):
-    def __init__(self, *args: Any, guild_ids: list[int], **kwargs: Any) -> None:
+    def __init__(self, *args: Any, guild_ids: tuple[int], **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.guild_ids = guild_ids
 

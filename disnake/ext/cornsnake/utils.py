@@ -43,7 +43,7 @@ async def fetch_guild_commands(client: Client) -> chain[APISlashCommand]:
     return cast("chain[APISlashCommand]", chain.from_iterable(commands))
 
 
-async def is_remote_command_outdated(remote: APISlashCommand, local: AnySlash) -> bool:
+def is_remote_command_outdated(remote: APISlashCommand, local: AnySlash) -> bool:
     return any((
         remote.default_member_permissions != local.default_member_permissions,
         remote.description_localizations != local.description_localizations,
@@ -60,7 +60,7 @@ async def commands_diff(client: Client, local: list[AnySlash]) -> CommandDiff:
     diff: CommandDiff = {"to_upsert": [], "to_delete": []}
 
     local_global_commands = {cmd.name: cmd for cmd in local if not isinstance(cmd, GuildSlashCommand)}
-    local_guild_commands = {cmd.name: (cmd.name, set(cmd.guild_ids)) for cmd in local if isinstance(cmd, GuildSlashCommand)}
+    local_guild_commands = {cmd.name: cmd for cmd in local if isinstance(cmd, GuildSlashCommand)}
 
     remote_global_commands = cast("list[APISlashCommand]", await client.fetch_global_commands(with_localizations=False))
     remote_guild_commands = await fetch_guild_commands(client)
@@ -91,7 +91,7 @@ async def commands_diff(client: Client, local: list[AnySlash]) -> CommandDiff:
             continue
 
         # If it's still defined locally, but for a different guild, mark it for deletion as well
-        if remote_guild_command.guild_id not in local_guild_command[1]:
+        if remote_guild_command.guild_id not in local_guild_command.guild_ids:
             diff["to_delete"].append((remote_guild_command.name, remote_guild_command.guild_id))
             continue
 

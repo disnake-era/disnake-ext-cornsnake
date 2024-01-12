@@ -40,7 +40,7 @@ def slash_command(
     dm_permission: bool | None = None,
     default_member_permissions: Permissions | int | None = None,
     nsfw: bool | None = None,
-    guild_ids: list[int] = ...,
+    guild_ids: tuple[int] = ...,
 ) -> Callable[[SlashCommandCallable | PendingSlashCommand], GuildSlashCommand]: ...
 
 def slash_command(name: LocalizedRequired, /, *args: Any, **kwargs: Any) -> Callable[[SlashCommandCallable | PendingSlashCommand], SlashCommand | GuildSlashCommand]:

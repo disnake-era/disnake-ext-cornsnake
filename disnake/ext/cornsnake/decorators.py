@@ -23,11 +23,11 @@ if TYPE_CHECKING:
 def slash_command(
     name: LocalizedRequired,
     /,
-    description: LocalizedRequired,
+    description: LocalizedRequired = "-",
     *,
     dm_permission: bool = False,
     default_member_permissions: Permissions | None = None,
-    nsfw: bool | None = None,
+    nsfw: bool = False,
     guild_ids: None = ...,
 ) -> Callable[[SlashCommandCallable | PendingSlashCommand], SlashCommand]: ...
 
@@ -39,7 +39,7 @@ def slash_command(
     *,
     dm_permission: bool = False,
     default_member_permissions: Permissions | None = None,
-    nsfw: bool | None = None,
+    nsfw: bool = False,
     guild_ids: tuple[int] = ...,
 ) -> Callable[[SlashCommandCallable | PendingSlashCommand], GuildSlashCommand]: ...
 
@@ -59,7 +59,28 @@ def slash_command(name: LocalizedRequired, /, *args: Any, **kwargs: Any) -> Call
     dm_permission: :class:`bool`
         Whether this command can be used in DMs. Defaults to ``True``.
     default_member_permissions: :class:`Permissions` | :class:`None`
-        
+        The default required member permissions for this command. A member must have
+        all these permissions to be able to invoke the command in a guild.
+
+        This is a default value, the set of users/roles that may invoke this command
+        can be overridden by moderators on a guild-specific basis, disregarding this setting.
+
+        If set to ``None`` (the default value), it means everyone can use the command by default.
+        If set to an empty :class:`Permissions` object (that is, all permissions set to False),
+        this means no one will be able to use the command.
+    nsfw: :class:`bool`
+        Whether this command can only be used in NSFW channels. Defaults to ``False``.
+    guild_ids: :class:`tuple`[:class:`int`] | :class:`None`
+        The guild IDs this command will be registered in. If ``None`` (the default value),
+        this command will be registered globally. Otherwise, the command will only be registered
+        in the specified guilds. Note that setting this to an empty tuple will have the effect of
+        this command not being registered at all.
+
+    Returns
+    -------
+    :class:`SlashCommand` | :class:`GuildSlashCommand`
+        The slash command. :class:`SlashCommand` if ``guild_ids`` were set to ``None``, otherwise
+        :class:`GuildSlashCommand`.
     """
     def decorator(cb: SlashCommandCallable | PendingSlashCommand) -> SlashCommand:
         per_guild = "guild_ids" in kwargs and kwargs.get("guild_ids") is not None
@@ -72,6 +93,7 @@ def slash_command(name: LocalizedRequired, /, *args: Any, **kwargs: Any) -> Call
             slash.options = cb.options
 
         return slash
+
     return decorator
 
 
@@ -103,7 +125,7 @@ def with_option(
     """
     def decorator(cb: SlashCommandCallable[P] | PendingSlashCommand[P]) -> PendingSlashCommand:
         option = Option(name, description, type_, required)
-    
+
         if callable(cb):
             cb = PendingSlashCommand(cb, [], [option])
         else:

@@ -47,7 +47,7 @@ class Bot(Client):
     async def process_commands(self, inter: AppCmdInter[Self]) -> None:
         for slash in self.slash_commands:
             if slash.name == inter.data.name:
-                if isinstance(slash, GuildSlashCommand) and not inter.guild_id in slash.guild_ids:
+                if isinstance(slash, GuildSlashCommand) and inter.guild_id not in slash.guild_ids:
                     continue
 
                 await slash.invoke(inter)

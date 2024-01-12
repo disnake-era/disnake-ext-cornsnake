@@ -6,7 +6,7 @@
    contain the root `toctree` directive.
 
 Welcome to disnake-ext-cornsnake's documentation!
-===================================
+=================================================
 
 .. toctree::
    :maxdepth: 2

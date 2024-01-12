@@ -16,16 +16,21 @@ if TYPE_CHECKING:
     from disnake.i18n import LocalizedRequired
 
     from .types_ import CheckCallable, P, SlashCommandCallable
+else:
+    from typing import TypeVar
 
+    P = TypeVar("P")
 
 @dataclass
-class PendingSlashCommand(Generic["P"]):
+class PendingSlashCommand(Generic[P]):
     cb: SlashCommandCallable
     checks: list[CheckCallable[P]]
     options: list[Option]
 
 
 class SlashCommand(DisnakeSlashCommand):
+    """A slash command."""
+
     def __init__(  # noqa: PLR0913
         self,
         name: LocalizedRequired,
@@ -50,10 +55,12 @@ class SlashCommand(DisnakeSlashCommand):
 
     @property
     def id(self) -> int | None:  # noqa: A003
+        """Command's ID. Only available after the command is registered."""
         command = self._api.get(0)
         return command and command.id
 
     async def invoke(self, inter: AppCmdInter[Any]) -> None:
+        """Call command's callback using """
         await self.callback(inter, **inter.options)
 
 class GuildSlashCommand(SlashCommand):

@@ -26,6 +26,9 @@ class Bot(Client):
         super().__init__(*args, **kwargs)
         self.slash_commands: list[AnySlash] = []
 
+    def add_slash_command(self, command: AnySlash) -> None:
+        self.slash_commands.append(command)
+
     async def on_ready(self) -> None:
         await self.register_commands()
 
@@ -44,4 +47,7 @@ class Bot(Client):
     async def process_commands(self, inter: AppCmdInter[Self]) -> None:
         for slash in self.slash_commands:
             if slash.name == inter.data.name:
+                if isinstance(slash, GuildSlashCommand) and not inter.guild_id in slash.guild_ids:
+                    continue
+
                 await slash.invoke(inter)

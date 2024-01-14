@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Generic
 
 from asyncstdlib.builtins import all as async_all
+
 from disnake import APISlashCommand
 from disnake.app_commands import SlashCommand as DisnakeSlashCommand
 
@@ -49,6 +50,7 @@ class SlashCommand(DisnakeSlashCommand):
         self._api: dict[int, APISlashCommand] = {}
 
     def upsert_api(self, api: APIApplicationCommand) -> None:
+        # TODO: Remove after disnake#1151 is merged
         if not isinstance(api, APISlashCommand):
             raise TypeError("Attempted to cache APIApplicationCommand that is not APISlashCommand. This is a bug.")
 

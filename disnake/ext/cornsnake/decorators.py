@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 def slash_command(
     name: LocalizedRequired,
     /,
-    description: LocalizedRequired = "-",
+    description: LocalizedRequired,
     *,
     dm_permission: bool = False,
     default_member_permissions: Permissions | None = None,
@@ -35,7 +35,7 @@ def slash_command(
 def slash_command(
     name: LocalizedRequired,
     /,
-    description: LocalizedRequired = "-",
+    description: LocalizedRequired,
     *,
     dm_permission: bool = False,
     default_member_permissions: Permissions | None = None,

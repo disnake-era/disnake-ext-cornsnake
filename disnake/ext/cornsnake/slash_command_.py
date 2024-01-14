@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Generic
 
+from asyncstdlib.builtins import all as async_all
 from disnake import APISlashCommand
 from disnake.app_commands import SlashCommand as DisnakeSlashCommand
 
@@ -38,13 +39,13 @@ class SlashCommand(DisnakeSlashCommand):
         /,
         description: LocalizedRequired,
         *,
-        options: list[Option] | None = None,
         dm_permission: bool | None = None,
         default_member_permissions: Permissions | int | None = None,
         nsfw: bool | None = None,
     ) -> None:
-        super().__init__(name, description, options, dm_permission, default_member_permissions, nsfw)
+        super().__init__(name, description, [], dm_permission, default_member_permissions, nsfw)
         self.callback = callback
+        self.checks: list[CheckCallable] = []
         self._api: dict[int, APISlashCommand] = {}
 
     def upsert_api(self, api: APIApplicationCommand) -> None:
@@ -60,8 +61,12 @@ class SlashCommand(DisnakeSlashCommand):
         return command and command.id
 
     async def invoke(self, inter: AppCmdInter[Any]) -> None:
-        """Call command's callback using """
+        """Invoke the command."""
+        if not await async_all(await check(inter, **inter.options) for check in self.checks):
+            return
+
         await self.callback(inter, **inter.options)
+
 
 class GuildSlashCommand(SlashCommand):
     def __init__(self, *args: Any, guild_ids: tuple[int], **kwargs: Any) -> None:

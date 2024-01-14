@@ -91,6 +91,7 @@ def slash_command(name: LocalizedRequired, /, *args: Any, **kwargs: Any) -> Call
         else:
             slash = class_(name, cb.cb, *args, **kwargs)
             slash.options = cb.options
+            slash.checks = cb.checks
 
         return slash
 
@@ -159,7 +160,7 @@ def with_check(
         if callable(cb):
             cb = PendingSlashCommand(cb, [check], [])
         else:
-            cb.checks.append(check)
+            cb.checks.insert(0, check)
 
         return cb
     return decorator

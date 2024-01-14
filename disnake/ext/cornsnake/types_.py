@@ -16,5 +16,5 @@ if TYPE_CHECKING:
 
     P = ParamSpec("P", default=...)
 
-    CheckCallable = Callable[P, bool]
+    CheckCallable = Callable[P, Awaitable[bool]]
     SlashCommandCallable = Callable[P, Awaitable[Any]]

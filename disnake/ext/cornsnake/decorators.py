@@ -14,11 +14,9 @@ if TYPE_CHECKING:
     from disnake import Permissions
     from disnake.i18n import LocalizedRequired
 
-    from .types_ import CheckCallable, P, SlashCommandCallable
+    from .types_ import CheckCallable, SlashCommandCallable, LambdaCheck
 
 # NOTE: overload order matters! apparently..
-# NOTE: [P]s not specified here as @slash_command is the command finalization step
-# and after it no options or checks can be added (and therefore checked).
 @overload
 def slash_command(
     name: LocalizedRequired,
@@ -105,7 +103,7 @@ def with_option(
     description: str | None = None,
     *,
     required: bool = False,
-) -> Callable[[SlashCommandCallable[P] | PendingSlashCommand[P]], PendingSlashCommand[P]]:
+) -> Callable[[SlashCommandCallable | PendingSlashCommand], PendingSlashCommand]:
     """Add an option to the slash conmand.
 
     Each command option must have a corresponding same-named parameter
@@ -123,8 +121,13 @@ def with_option(
         Whether the option is required. If the option is not required,
         the corresponding slash command's parameter must have a default
         specified. Defaults to ``False``.
+
+    Returns
+    -------
+    :class:`PendingSlashCommand`
+        The updated slash command factory.
     """
-    def decorator(cb: SlashCommandCallable[P] | PendingSlashCommand[P]) -> PendingSlashCommand:
+    def decorator(cb: SlashCommandCallable | PendingSlashCommand) -> PendingSlashCommand:
         option = Option(name, description, type_, required)
 
         if callable(cb):
@@ -137,8 +140,8 @@ def with_option(
 
 
 def with_check(
-    check: CheckCallable[P]
-) -> Callable[[SlashCommandCallable[P] | PendingSlashCommand[P]], PendingSlashCommand[P]]:
+    check: CheckCallable | LambdaCheck
+) -> Callable[[SlashCommandCallable | PendingSlashCommand], PendingSlashCommand]:
     """Add a pre-run check to slash command.
 
     Commands checks are run from top to bottom in the same order
@@ -156,7 +159,7 @@ def with_check(
     :class:`PendingSlashCommand`
         The updated slash command factory.
     """
-    def decorator(cb: SlashCommandCallable[P] | PendingSlashCommand[P]) -> PendingSlashCommand[P]:
+    def decorator(cb: SlashCommandCallable | PendingSlashCommand) -> PendingSlashCommand:
         if callable(cb):
             cb = PendingSlashCommand(cb, [check], [])
         else:

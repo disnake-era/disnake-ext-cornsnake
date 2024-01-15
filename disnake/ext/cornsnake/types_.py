@@ -8,13 +8,18 @@ if TYPE_CHECKING:
     from collections.abc import Awaitable
     from typing import Any, Callable
 
-    from typing_extensions import ParamSpec, TypeAlias
+    from typing_extensions import TypeAlias
 
-    from .slash_command_ import GuildSlashCommand, SlashCommand
+    from disnake import AppCmdInter
 
-    AnySlash: TypeAlias = "SlashCommand | GuildSlashCommand"
+    from .bot import Bot
+    from .slash_command_ import GuildSlashCommand, SlashCommand, UserCommand, GuildUserCommand, MessageCommand, GuildMessageCommand
 
-    P = ParamSpec("P", default=...)
+    AnySlashCmd: TypeAlias = "SlashCommand | GuildSlashCommand"
+    AnyUserCmd: TypeAlias = "UserCommand | GuildUserCommand"
+    AnyUserCmd: TypeAlias = "MessageCommand | GuildMessageCommand"
 
-    CheckCallable = Callable[P, Awaitable[bool]]
-    SlashCommandCallable = Callable[P, Awaitable[Any]]
+    CornInter = AppCmdInter[Bot]
+    LambdaCheck = Callable[[CornInter], bool]
+    CheckCallable = Callable[[CornInter], Awaitable[bool]]
+    SlashCommandCallable: TypeAlias = Callable[..., Awaitable[Any]]

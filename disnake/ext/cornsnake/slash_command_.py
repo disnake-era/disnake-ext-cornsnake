@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Generic
+from typing import TYPE_CHECKING
 
 from asyncstdlib.builtins import all as async_all
 
 from disnake import APISlashCommand
 from disnake.app_commands import SlashCommand as DisnakeSlashCommand
+from disnake.utils import maybe_coroutine
 
 if TYPE_CHECKING:
     from typing import Any
@@ -17,16 +18,12 @@ if TYPE_CHECKING:
     from disnake.app_commands import APIApplicationCommand
     from disnake.i18n import LocalizedRequired
 
-    from .types_ import CheckCallable, P, SlashCommandCallable
-else:
-    from typing import TypeVar
-
-    P = TypeVar("P")
+    from .types_ import CheckCallable, SlashCommandCallable, LambdaCheck
 
 @dataclass
-class PendingSlashCommand(Generic[P]):
+class PendingSlashCommand:
     cb: SlashCommandCallable
-    checks: list[CheckCallable[P]]
+    checks: list[CheckCallable | LambdaCheck]
     options: list[Option]
 
 
@@ -46,7 +43,7 @@ class SlashCommand(DisnakeSlashCommand):
     ) -> None:
         super().__init__(name, description, [], dm_permission, default_member_permissions, nsfw)
         self.callback = callback
-        self.checks: list[CheckCallable] = []
+        self.checks: list[CheckCallable | LambdaCheck] = []
         self._api: dict[int, APISlashCommand] = {}
 
     def upsert_api(self, api: APIApplicationCommand) -> None:
@@ -64,7 +61,7 @@ class SlashCommand(DisnakeSlashCommand):
 
     async def invoke(self, inter: AppCmdInter[Any]) -> None:
         """Invoke the command."""
-        if not await async_all(await check(inter, **inter.options) for check in self.checks):
+        if not await async_all(await maybe_coroutine(check, inter, **inter.options) for check in self.checks):
             return
 
         await self.callback(inter, **inter.options)
@@ -76,5 +73,6 @@ class GuildSlashCommand(SlashCommand):
         self.guild_ids = guild_ids
 
     def get_id(self, guild_id: int) -> int | None:
+        """Get this command's ID in the specified guild."""
         command = self._api.get(guild_id)
         return command and command.id

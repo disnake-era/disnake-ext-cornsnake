@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from disnake import Permissions
     from disnake.i18n import LocalizedRequired
 
-    from .types_ import CheckCallable, SlashCommandCallable, LambdaCheck
+    from .types_ import AsyncCheck, CommandCallable, LambdaCheck
 
 # NOTE: overload order matters! apparently..
 @overload
@@ -27,7 +27,7 @@ def slash_command(
     default_member_permissions: Permissions | None = None,
     nsfw: bool = False,
     guild_ids: None = ...,
-) -> Callable[[SlashCommandCallable | PendingSlashCommand], SlashCommand]: ...
+) -> Callable[[CommandCallable | PendingSlashCommand], SlashCommand]: ...
 
 @overload
 def slash_command(
@@ -39,9 +39,9 @@ def slash_command(
     default_member_permissions: Permissions | None = None,
     nsfw: bool = False,
     guild_ids: tuple[int] = ...,
-) -> Callable[[SlashCommandCallable | PendingSlashCommand], GuildSlashCommand]: ...
+) -> Callable[[CommandCallable | PendingSlashCommand], GuildSlashCommand]: ...
 
-def slash_command(name: LocalizedRequired, /, *args: Any, **kwargs: Any) -> Callable[[SlashCommandCallable | PendingSlashCommand], SlashCommand | GuildSlashCommand]:
+def slash_command(name: LocalizedRequired, /, *args: Any, **kwargs: Any) -> Callable[[CommandCallable | PendingSlashCommand], SlashCommand | GuildSlashCommand]:
     """Finalize all pending options and checks (if any) into a slash command.
 
     Collects all pending slash command options and checks into a :class:`SlashCommand`
@@ -80,7 +80,7 @@ def slash_command(name: LocalizedRequired, /, *args: Any, **kwargs: Any) -> Call
         The slash command. :class:`SlashCommand` if ``guild_ids`` were set to ``None``, otherwise
         :class:`GuildSlashCommand`.
     """
-    def decorator(cb: SlashCommandCallable | PendingSlashCommand) -> SlashCommand:
+    def decorator(cb: CommandCallable | PendingSlashCommand) -> SlashCommand:
         per_guild = "guild_ids" in kwargs and kwargs.get("guild_ids") is not None
         class_ = GuildSlashCommand if per_guild else SlashCommand
 
@@ -103,7 +103,7 @@ def with_option(
     description: str | None = None,
     *,
     required: bool = False,
-) -> Callable[[SlashCommandCallable | PendingSlashCommand], PendingSlashCommand]:
+) -> Callable[[CommandCallable | PendingSlashCommand], PendingSlashCommand]:
     """Add an option to the slash conmand.
 
     Each command option must have a corresponding same-named parameter
@@ -127,7 +127,7 @@ def with_option(
     :class:`PendingSlashCommand`
         The updated slash command factory.
     """
-    def decorator(cb: SlashCommandCallable | PendingSlashCommand) -> PendingSlashCommand:
+    def decorator(cb: CommandCallable | PendingSlashCommand) -> PendingSlashCommand:
         option = Option(name, description, type_, required)
 
         if callable(cb):
@@ -140,8 +140,8 @@ def with_option(
 
 
 def with_check(
-    check: CheckCallable | LambdaCheck
-) -> Callable[[SlashCommandCallable | PendingSlashCommand], PendingSlashCommand]:
+    check: AsyncCheck | LambdaCheck
+) -> Callable[[CommandCallable | PendingSlashCommand], PendingSlashCommand]:
     """Add a pre-run check to slash command.
 
     Commands checks are run from top to bottom in the same order
@@ -159,7 +159,7 @@ def with_check(
     :class:`PendingSlashCommand`
         The updated slash command factory.
     """
-    def decorator(cb: SlashCommandCallable | PendingSlashCommand) -> PendingSlashCommand:
+    def decorator(cb: CommandCallable | PendingSlashCommand) -> PendingSlashCommand:
         if callable(cb):
             cb = PendingSlashCommand(cb, [check], [])
         else:

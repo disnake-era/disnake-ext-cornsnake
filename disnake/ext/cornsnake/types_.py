@@ -13,13 +13,10 @@ if TYPE_CHECKING:
     from disnake import AppCmdInter
 
     from .bot import Bot
-    from .slash_command_ import GuildSlashCommand, SlashCommand, UserCommand, GuildUserCommand, MessageCommand, GuildMessageCommand
 
-    AnySlashCmd: TypeAlias = "SlashCommand | GuildSlashCommand"
-    AnyUserCmd: TypeAlias = "UserCommand | GuildUserCommand"
-    AnyUserCmd: TypeAlias = "MessageCommand | GuildMessageCommand"
+    AnyCheck: TypeAlias = "LambdaCheck | AsyncCheck"
 
     CornInter = AppCmdInter[Bot]
     LambdaCheck = Callable[[CornInter], bool]
-    CheckCallable = Callable[[CornInter], Awaitable[bool]]
-    SlashCommandCallable: TypeAlias = Callable[..., Awaitable[Any]]
+    AsyncCheck = Callable[[CornInter], Awaitable[bool]]
+    CommandCallable: TypeAlias = Callable[..., Awaitable[Any]]
